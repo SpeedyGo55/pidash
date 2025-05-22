@@ -176,9 +176,8 @@ fn cpu_usage() -> f64 {
             parts[7].parse::<f64>().unwrap()
         })
         .sum::<f64>();
-    let cpu_usage = ((cpu_user + cpu_system + cpu_iowait + cpu_irq + cpu_softirq + cpu_nice)
-        / cpu_idle)
-        * 100.0;
+    let cpu_total = cpu_user + cpu_system + cpu_iowait + cpu_irq + cpu_softirq + cpu_nice + cpu_idle;
+    let cpu_usage = (cpu_total - cpu_idle) / cpu_total * 100.0;
     cpu_usage
 }
 
@@ -194,16 +193,16 @@ fn mem_usage() -> (i32, i32) {
         .unwrap()
         .parse::<i32>()
         .unwrap();
-    let mem_free = meminfo_str
+    let mem_avail = meminfo_str
         .lines()
-        .find(|line| line.starts_with("MemFree:"))
+        .find(|line| line.starts_with("MemAvailable:"))
         .unwrap()
         .split_whitespace()
         .nth(1)
         .unwrap()
         .parse::<i32>()
         .unwrap();
-    let mem_used = mem_total - mem_free;
+    let mem_used = mem_total - mem_avail;
     (mem_total, mem_used)
 }
 fn disk_usage() -> (String, String, String) {
