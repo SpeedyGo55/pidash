@@ -115,67 +115,67 @@ fn cpu_usage() -> f64 {
     let cpuinfo_str = std::fs::read_to_string(cpuinfo).unwrap();
     let cpu_user = cpuinfo_str
         .lines()
-        .skip(1)
-        .filter(|line| line.starts_with("cpu"))
-        .map(|line| {
-            let parts: Vec<&str> = line.split_whitespace().collect();
-            parts[1].parse::<f64>().unwrap()
-        })
-        .sum::<f64>();
+        .find(|line| line.starts_with("cpu "))
+        .unwrap()
+        .split_whitespace()
+        .nth(1)
+        .unwrap()
+        .parse::<f64>()
+        .unwrap();
     let cpu_nice = cpuinfo_str
         .lines()
-        .skip(1)
-        .filter(|line| line.starts_with("cpu"))
-        .map(|line| {
-            let parts: Vec<&str> = line.split_whitespace().collect();
-            parts[2].parse::<f64>().unwrap()
-        })
-        .sum::<f64>();
+        .find(|line| line.starts_with("cpu "))
+        .unwrap()
+        .split_whitespace()
+        .nth(2)
+        .unwrap()
+        .parse::<f64>()
+        .unwrap();
     let cpu_system = cpuinfo_str
         .lines()
-        .skip(1)
-        .filter(|line| line.starts_with("cpu"))
-        .map(|line| {
-            let parts: Vec<&str> = line.split_whitespace().collect();
-            parts[3].parse::<f64>().unwrap()
-        })
-        .sum::<f64>();
+        .find(|line| line.starts_with("cpu "))
+        .unwrap()
+        .split_whitespace()
+        .nth(3)
+        .unwrap()
+        .parse::<f64>()
+        .unwrap();
     let cpu_idle = cpuinfo_str
         .lines()
-        .skip(1)
-        .filter(|line| line.starts_with("cpu"))
-        .map(|line| {
-            let parts: Vec<&str> = line.split_whitespace().collect();
-            parts[4].parse::<f64>().unwrap()
-        })
-        .sum::<f64>();
+        .find(|line| line.starts_with("cpu "))
+        .unwrap()
+        .split_whitespace()
+        .nth(4)
+        .unwrap()
+        .parse::<f64>()
+        .unwrap();
     let cpu_iowait = cpuinfo_str
         .lines()
-        .skip(1)
-        .filter(|line| line.starts_with("cpu"))
-        .map(|line| {
-            let parts: Vec<&str> = line.split_whitespace().collect();
-            parts[5].parse::<f64>().unwrap()
-        })
-        .sum::<f64>();
+        .find(|line| line.starts_with("cpu "))
+        .unwrap()
+        .split_whitespace()
+        .nth(5)
+        .unwrap()
+        .parse::<f64>()
+        .unwrap();
     let cpu_irq = cpuinfo_str
         .lines()
-        .skip(1)
-        .filter(|line| line.starts_with("cpu"))
-        .map(|line| {
-            let parts: Vec<&str> = line.split_whitespace().collect();
-            parts[6].parse::<f64>().unwrap()
-        })
-        .sum::<f64>();
+        .find(|line| line.starts_with("cpu "))
+        .unwrap()
+        .split_whitespace()
+        .nth(6)
+        .unwrap()
+        .parse::<f64>()
+        .unwrap();
     let cpu_softirq = cpuinfo_str
         .lines()
-        .skip(1)
-        .filter(|line| line.starts_with("cpu"))
-        .map(|line| {
-            let parts: Vec<&str> = line.split_whitespace().collect();
-            parts[7].parse::<f64>().unwrap()
-        })
-        .sum::<f64>();
+        .find(|line| line.starts_with("cpu "))
+        .unwrap()
+        .split_whitespace()
+        .nth(7)
+        .unwrap()
+        .parse::<f64>()
+        .unwrap();
     let cpu_total = cpu_user + cpu_system + cpu_iowait + cpu_irq + cpu_softirq + cpu_nice + cpu_idle;
     let cpu_usage = (cpu_total - cpu_idle) / cpu_total * 100.0;
     cpu_usage
