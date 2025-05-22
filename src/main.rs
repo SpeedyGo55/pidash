@@ -40,8 +40,11 @@ async fn main() {
 
     // spawn thread to handle database operations
     tokio::spawn(async move {
-        value_logging();
-        sleep(Duration::from_secs(60)).await;
+        loop {
+            // log cpu usage and memory usage history in database
+            value_logging();
+            sleep(Duration::from_secs(60)).await;
+        }
     });
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
