@@ -243,6 +243,7 @@ async fn get_history(Query(params): Query<HashMap<String, String>>) -> Json<Valu
     let last = "now".to_string();
     let from = params.get("from").unwrap_or(&first);
     let to = params.get("to").unwrap_or(&last);
+    let limit = params.get("limit").and_then(|s| s.parse::<usize>().ok()).unwrap_or(100);
 
     let conn = match Connection::open("history.db") {
         Ok(conn) => conn,
@@ -253,7 +254,7 @@ async fn get_history(Query(params): Query<HashMap<String, String>>) -> Json<Valu
         }
     };
 
-    let mut stmt = match conn.prepare("SELECT cpu_usage, mem_total, mem_used, disk_total, disk_used, disk_free, timestamp FROM 'values' WHERE timestamp BETWEEN ? AND ?") {
+    let mut stmt = match conn.prepare("SELECT cpu_usage, mem_total, mem_used, disk_total, disk_used, disk_free, timestamp FROM 'values' WHERE timestamp BETWEEN ? AND ? ORDER BY timestamp DESC LIMIT ?") {
         Ok(stmt) => stmt,
         Err(e) => {
             return Json(json!({
@@ -262,7 +263,7 @@ async fn get_history(Query(params): Query<HashMap<String, String>>) -> Json<Valu
         }
     };
 
-    let rows_result = stmt.query_map(params![from, to], |row| {
+    let rows_result = stmt.query_map(params![from, to, limit], |row| {
         Ok(json!({
             "cpu_usage": row.get::<_, f64>(0)?,
             "mem_total": row.get::<_, i32>(1)?,
