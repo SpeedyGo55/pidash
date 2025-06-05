@@ -1,7 +1,9 @@
 use std::{collections::HashMap, time::Duration};
 
 // A Dashboard for my Raspberry PI which will display Component Temps, Fan speed, uptime etc.
-use axum::{Json, Router, extract::Query, routing::get, extract::ConnectInfo};
+use axum::{Json, Router, extract::Query, routing::get, extract::ConnectInfo, middleware, extract};
+use axum::extract::FromRequestParts;
+use axum::middleware::Next;
 use axum_client_ip::{ClientIp, ClientIpSource};
 use log::{error, info, trace};
 use rusqlite::{Connection, params};
@@ -9,6 +11,8 @@ use serde_json::{Value, json};
 use tokio::time::sleep;
 use tracing_subscriber::EnvFilter;
 use tower_http::trace::TraceLayer;
+use tracing::{info_span, Span};
+use tower::ServiceBuilder;
 
 #[tokio::main]
 async fn main() {
@@ -48,7 +52,34 @@ async fn main() {
         .route("/cpu_usage", get(get_cpu_usage))
         .route("/history", get(get_history))
         .layer(TraceLayer::new_for_http())
-        .layer(ClientIpSource::ConnectInfo.into_extension());
+        .layer(
+            ServiceBuilder::new()
+                // Hardcode IP source, look into `examples/configurable.rs` for runtime
+                // configuration
+                .layer(ClientIpSource::ConnectInfo.into_extension())
+                // Create a request span with a placeholder for IP
+                .layer(
+                    TraceLayer::new_for_http().make_span_with(|request: &http::Request<_>| {
+                        info_span!(
+                            "request",
+                            method = %request.method(),
+                            uri = %request.uri(),
+                            ip = tracing::field::Empty
+                        )
+                    }),
+                )
+                // Extract IP and fill the span placeholder
+                .layer(middleware::from_fn(
+                    async |request: extract::Request, next: Next| {
+                        let (mut parts, body) = request.into_parts();
+                        if let Ok(ip) = ClientIp::from_request_parts(&mut parts, &()).await {
+                            let span = Span::current();
+                            span.record("ip", ip.0.to_string());
+                        }
+                        next.run(extract::Request::from_parts(parts, body)).await
+                    },
+                )),
+        );
 
     // spawn thread to handle database operations
     tokio::spawn(async move {
