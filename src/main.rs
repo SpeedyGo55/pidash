@@ -1,7 +1,7 @@
 use std::{collections::HashMap, time::Duration};
 
 // A Dashboard for my Raspberry PI which will display Component Temps, Fan speed, uptime etc.
-use axum::{Json, Router, extract::Query, routing::get};
+use axum::{Json, Router, extract::Query, routing::get, extract::ConnectInfo};
 use axum_client_ip::{ClientIp, ClientIpSource};
 use log::{error, info, trace};
 use rusqlite::{Connection, params};
