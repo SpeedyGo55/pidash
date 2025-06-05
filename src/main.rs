@@ -93,8 +93,7 @@ async fn main() {
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
-async fn get_cpu_temp(ClientIp(ip): ClientIp) -> Json<Value> {
-    info!("/cpu_temp {}", ip);
+async fn get_cpu_temp() -> Json<Value> {
     // Read CPU temperature from the thermal zone file
     trace!("Reading CPU temperature from thermal zone file");
     let thermal_zone = "/sys/class/thermal/thermal_zone0/temp";
@@ -113,8 +112,7 @@ async fn get_cpu_temp(ClientIp(ip): ClientIp) -> Json<Value> {
     Json(json)
 }
 
-async fn get_fan_speed(ClientIp(ip): ClientIp) -> Json<Value> {
-    info!("/fan_speed {}", ip);
+async fn get_fan_speed() -> Json<Value> {
     // Read fan speed from the hardware monitor file
     trace!("Reading fan speed from hardware monitor file");
     let fan_speed = "/sys/devices/platform/cooling_fan/hwmon/hwmon2/fan1_input";
@@ -133,8 +131,7 @@ async fn get_fan_speed(ClientIp(ip): ClientIp) -> Json<Value> {
     Json(json)
 }
 
-async fn get_uptime(ClientIp(ip): ClientIp) -> Json<Value> {
-    info!("/uptime {}", ip);
+async fn get_uptime() -> Json<Value> {
     // Read system uptime from the /proc/uptime file
     trace!("Reading system uptime from /proc/uptime file");
     let uptime = "/proc/uptime";
@@ -166,8 +163,7 @@ async fn get_uptime(ClientIp(ip): ClientIp) -> Json<Value> {
     Json(json)
 }
 
-async fn get_mem_usage(ClientIp(ip): ClientIp) -> Json<Value> {
-    info!("/mem_usage {}", ip);
+async fn get_mem_usage() -> Json<Value> {
     // Read memory usage from the /proc/meminfo file
     trace!("Fetching memory usage for http request");
     let (mem_total, mem_used) = mem_usage();
@@ -179,8 +175,7 @@ async fn get_mem_usage(ClientIp(ip): ClientIp) -> Json<Value> {
     Json(json)
 }
 
-async fn get_disk_usage(ClientIp(ip): ClientIp) -> Json<Value> {
-    info!("/disk_usage {}", ip);
+async fn get_disk_usage() -> Json<Value> {
     // Read disk usage from the df command output
     trace!("Fetching disk usage for http request");
     let (total, used, free) = disk_usage();
@@ -193,8 +188,7 @@ async fn get_disk_usage(ClientIp(ip): ClientIp) -> Json<Value> {
     Json(json)
 }
 
-async fn get_cpu_usage(ClientIp(ip): ClientIp) -> Json<Value> {
-    info!("/cpu_usage {}", ip);
+async fn get_cpu_usage() -> Json<Value> {
     // Read CPU usage from the /proc/stat file
     trace!("Fetching CPU usage for http request");
     let cpu_usage = cpu_usage();
