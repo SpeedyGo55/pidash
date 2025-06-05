@@ -101,10 +101,7 @@ async fn main() {
                 )),
         )
         .layer(CorsLayer::new()
-            .allow_origin(tower_http::cors::Any)
-            .allow_methods(tower_http::cors::Any)
-            .allow_headers(tower_http::cors::Any)
-            .allow_credentials(true));
+            .allow_origin(tower_http::cors::Any));
 
     // spawn thread to handle database operations
     tokio::spawn(async move {
