@@ -9,18 +9,23 @@ use log::{error, info, trace};
 use rusqlite::{Connection, params};
 use serde_json::{Value, json};
 use tokio::time::sleep;
-use tracing_subscriber::EnvFilter;
+use tracing_subscriber::{fmt, EnvFilter};
 use tower_http::trace::TraceLayer;
 use tracing::{info_span, Span};
 use tower::ServiceBuilder;
+use tracing::level_filters::LevelFilter;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::fmt()
-        .with_env_filter(
-            EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| EnvFilter::new("pidash=info,tower-http=warn"))
+    tracing_subscriber::registry()
+        .with(
+            EnvFilter::builder()
+                .with_default_directive(LevelFilter::TRACE.into())
+                .from_env_lossy(),
         )
+        .with(fmt::layer())
         .init();
     let conn = Connection::open("history.db").unwrap();
     match conn.execute(
