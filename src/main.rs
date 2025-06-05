@@ -15,7 +15,7 @@ async fn main() {
     tracing_subscriber::fmt()
         .with_env_filter(
             EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| EnvFilter::new("pidash=error,tower-http=warn"))
+                .unwrap_or_else(|_| EnvFilter::new("pidash=info,tower-http=warn"))
         )
         .init();
     let conn = Connection::open("history.db").unwrap();
