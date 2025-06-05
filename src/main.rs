@@ -1,10 +1,12 @@
 use std::{collections::HashMap, time::Duration};
-
+use std::net::SocketAddr;
+use std::path::PathBuf;
 // A Dashboard for my Raspberry PI which will display Component Temps, Fan speed, uptime etc.
 use axum::{Json, Router, extract::Query, routing::get, extract::ConnectInfo, middleware, extract};
 use axum::extract::FromRequestParts;
 use axum::middleware::Next;
 use axum_client_ip::{ClientIp, ClientIpSource};
+use axum_server::RustlsConfig;
 use log::{error, info, trace};
 use rusqlite::{Connection, params};
 use serde_json::{Value, json};
@@ -46,6 +48,17 @@ async fn main() {
             error!("Failed to create table: {}", err);
         }
     }
+
+    let config = RustlsConfig::from_pem_file(
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("certs")
+            .join("cert.pem"),
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("certs")
+            .join("key.pem"),
+    )
+        .await
+        .unwrap();
 
     // build our application with a single route
     let app = Router::new()
@@ -94,9 +107,12 @@ async fn main() {
             sleep(Duration::from_secs(60)).await;
         }
     });
-    // run our app with hyper, listening globally on port 3000
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:80").await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    let addr = SocketAddr::from(([0, 0, 0, 0], 80));
+    info!("Starting server on https://{}", addr);
+    axum_server::bind_rustls(addr, config)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
 }
 async fn get_cpu_temp() -> Json<Value> {
     // Read CPU temperature from the thermal zone file
