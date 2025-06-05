@@ -22,7 +22,7 @@ async fn main() {
     tracing_subscriber::registry()
         .with(
             EnvFilter::builder()
-                .with_default_directive(LevelFilter::INFO.into())
+                .with_default_directive(LevelFilter::DEBUG.into())
                 .from_env_lossy(),
         )
         .with(fmt::layer())
