@@ -14,3 +14,4 @@ log = "0.4.27"
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 tower-http = { version = "0.6.6", features = ["trace"] }
+axum-client-ip = "1.1.3"
