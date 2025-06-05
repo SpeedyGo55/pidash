@@ -15,7 +15,7 @@ use tokio::time::sleep;
 use tracing_subscriber::{fmt, EnvFilter};
 use tower_http::trace::TraceLayer;
 use tracing::{info_span, Span};
-use tower::ServiceBuilder;
+use tower::{Layer, ServiceBuilder};
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
@@ -101,7 +101,9 @@ async fn main() {
                 )),
         )
         .layer(CorsLayer::new()
-            .allow_origin(tower_http::cors::Any));
+            .allow_origin(tower_http::cors::Any)
+            .allow_methods(tower_http::cors::Any)
+            .allow_headers(tower_http::cors::Any));
 
     // spawn thread to handle database operations
     tokio::spawn(async move {
