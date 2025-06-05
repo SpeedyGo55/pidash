@@ -63,7 +63,6 @@ async fn main() {
 }
 async fn get_cpu_temp() -> Json<Value> {
     // Read CPU temperature from the thermal zone file
-    info!("Fetching CPU temperature");
     trace!("Reading CPU temperature from thermal zone file");
     let thermal_zone = "/sys/class/thermal/thermal_zone0/temp";
     let temp = std::fs::read_to_string(thermal_zone);
@@ -83,7 +82,6 @@ async fn get_cpu_temp() -> Json<Value> {
 
 async fn get_fan_speed() -> Json<Value> {
     // Read fan speed from the hardware monitor file
-    info!("Fetching fan speed");
     trace!("Reading fan speed from hardware monitor file");
     let fan_speed = "/sys/devices/platform/cooling_fan/hwmon/hwmon2/fan1_input";
     let speed = std::fs::read_to_string(fan_speed);
@@ -103,7 +101,6 @@ async fn get_fan_speed() -> Json<Value> {
 
 async fn get_uptime() -> Json<Value> {
     // Read system uptime from the /proc/uptime file
-    info!("Fetching system uptime");
     trace!("Reading system uptime from /proc/uptime file");
     let uptime = "/proc/uptime";
     let uptime_str = std::fs::read_to_string(uptime);
@@ -136,7 +133,7 @@ async fn get_uptime() -> Json<Value> {
 
 async fn get_mem_usage() -> Json<Value> {
     // Read memory usage from the /proc/meminfo file
-    info!("Fetching memory usage for http request");
+    trace!("Fetching memory usage for http request");
     let (mem_total, mem_used) = mem_usage();
     let json = json!({
         "mem_used": mem_used,
@@ -148,7 +145,7 @@ async fn get_mem_usage() -> Json<Value> {
 
 async fn get_disk_usage() -> Json<Value> {
     // Read disk usage from the df command output
-    info!("Fetching disk usage for http request");
+    trace!("Fetching disk usage for http request");
     let (total, used, free) = disk_usage();
     let json = json!({
         "total": total,
@@ -161,7 +158,7 @@ async fn get_disk_usage() -> Json<Value> {
 
 async fn get_cpu_usage() -> Json<Value> {
     // Read CPU usage from the /proc/stat file
-    info!("Fetching CPU usage for http request");
+    trace!("Fetching CPU usage for http request");
     let cpu_usage = cpu_usage();
     let json = json!({
         "cpu_usage": cpu_usage
@@ -171,7 +168,6 @@ async fn get_cpu_usage() -> Json<Value> {
 
 fn cpu_usage() -> f64 {
     // Read CPU usage from the /proc/stat file
-    info!("Calculating CPU usage");
     trace!("Reading CPU usage from /proc/stat file");
     let cpuinfo = "/proc/stat";
     let cpuinfo_str = std::fs::read_to_string(cpuinfo);
@@ -284,7 +280,6 @@ fn cpu_usage() -> f64 {
 
 fn mem_usage() -> (i32, i32) {
     // Read memory usage from the /proc/meminfo file
-    info!("Calculating memory usage");
     trace!("Reading memory usage from /proc/meminfo file");
     let meminfo = "/proc/meminfo";
     let meminfo_str = std::fs::read_to_string(meminfo);
@@ -328,7 +323,6 @@ fn mem_usage() -> (i32, i32) {
 }
 fn disk_usage() -> (String, String, String) {
     // Read disk usage from the df command output
-    info!("Calculating disk usage");
     trace!("Running df command to get disk usage");
     let df_output = std::process::Command::new("df").output();
     let df_output = match df_output {
@@ -392,7 +386,7 @@ fn value_logging() {
 
 async fn get_history(Query(params): Query<HashMap<String, String>>) -> Json<Value> {
     // Handle history requests with optional query parameters
-    info!("Fetching history data with parameters: {:?}", params);
+    trace!("Fetching history data with parameters: {:?}", params);
     // Extract from and to dates from query parameters or use defaults (1970-01-01T00:00:00Z)
     let first = "1970-01-01T00:00:00Z".to_string();
     let last = "now".to_string();
