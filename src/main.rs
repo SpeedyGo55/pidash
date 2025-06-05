@@ -2,7 +2,7 @@ use std::{collections::HashMap, time::Duration};
 
 // A Dashboard for my Raspberry PI which will display Component Temps, Fan speed, uptime etc.
 use axum::{Json, Router, extract::Query, routing::get};
-use axum_client_ip::ClientIp;
+use axum_client_ip::{ClientIp, ClientIpSource};
 use log::{error, info, trace};
 use rusqlite::{Connection, params};
 use serde_json::{Value, json};
@@ -47,7 +47,8 @@ async fn main() {
         .route("/disk_usage", get(get_disk_usage))
         .route("/cpu_usage", get(get_cpu_usage))
         .route("/history", get(get_history))
-        .layer(TraceLayer::new_for_http());
+        .layer(TraceLayer::new_for_http())
+        .layer(ClientIpSource::ConnectInfo.into_extension());
 
     // spawn thread to handle database operations
     tokio::spawn(async move {
