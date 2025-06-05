@@ -6,7 +6,8 @@ use axum::{Json, Router, extract::Query, routing::get, extract::ConnectInfo, mid
 use axum::extract::FromRequestParts;
 use axum::middleware::Next;
 use axum_client_ip::{ClientIp, ClientIpSource};
-use axum_server::RustlsConfig;
+use axum_server::tls_rustls;
+use axum_server::tls_rustls::RustlsConfig;
 use log::{error, info, trace};
 use rusqlite::{Connection, params};
 use serde_json::{Value, json};
